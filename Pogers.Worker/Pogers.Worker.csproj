@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>dotnet-Pogers.Worker-d2fbd669-f235-4f87-a7b3-80712a092354</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Pogers.Core\Pogers.Core.csproj" />
+    <ProjectReference Include="..\Pogers.Infrastructure\Pogers.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

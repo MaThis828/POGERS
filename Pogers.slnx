@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="Pogers.Api/Pogers.Api.csproj" />
+  <Project Path="Pogers.Core/Pogers.Core.csproj" />
+  <Project Path="Pogers.Infrastructure/Pogers.Infrastructure.csproj" />
+  <Project Path="Pogers.Tests/Pogers.Tests.csproj" />
+  <Project Path="Pogers.Worker/Pogers.Worker.csproj" />
+</Solution>

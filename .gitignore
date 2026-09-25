@@ -1,0 +1,23 @@
+# .NET
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+*.user
+*.suo
+.vs/
+
+# EF Core / SQLite - die Datenbank wird vom Worker erzeugt
+*.db
+*.db-shm
+*.db-wal
+
+# Angular / Node
+node_modules/
+web/dist/
+web/.angular/
+npm-debug.log*
+
+# Betriebssystem
+Thumbs.db
+.DS_Store
