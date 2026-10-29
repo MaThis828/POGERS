@@ -5,7 +5,8 @@ using Pogers.Worker;
 var builder = Host.CreateApplicationBuilder(args);
 
 builder.Services.AddPersistence(builder.Configuration);
-builder.Services.AddHostedService<Worker>();
+builder.Services.AddImport(builder.Configuration);
+builder.Services.AddHostedService<ImportHostedService>();
 
 var host = builder.Build();
 
