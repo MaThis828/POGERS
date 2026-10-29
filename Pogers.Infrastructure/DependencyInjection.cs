@@ -49,6 +49,7 @@ namespace Pogers.Infrastructure
 
             dienste.AddHttpClient<IDipApiClient, DipApiClient>();
             dienste.AddScoped<IPersonImportService, PersonImportService>();
+            dienste.AddScoped<IVorgangImportService, VorgangImportService>();
 
             return dienste;
         }

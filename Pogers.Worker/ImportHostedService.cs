@@ -31,9 +31,10 @@ namespace Pogers.Worker
             try
             {
                 using var bereich = _dienste.CreateScope();
-                var import = bereich.ServiceProvider.GetRequiredService<IPersonImportService>();
+                var dienste = bereich.ServiceProvider;
 
-                await import.ImportAsync(wahlperiode, stoppingToken);
+                await dienste.GetRequiredService<IPersonImportService>().ImportAsync(wahlperiode, stoppingToken);
+                await dienste.GetRequiredService<IVorgangImportService>().ImportAsync(wahlperiode, stoppingToken);
             }
             catch (OperationCanceledException) when (stoppingToken.IsCancellationRequested)
             {

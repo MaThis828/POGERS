@@ -133,7 +133,7 @@ namespace Pogers.Tests
         private static async Task<ImportBilanz> ImportiereAsync(TestDb db, int wahlperiode, params string[] personenJson)
         {
             var handler = new FakeHttpMessageHandler()
-                .RespondWithJson(TestFactory.PersonSeite(null, personenJson));
+                .RespondWithJson(TestFactory.Seite(null, personenJson));
 
             using var ctx = db.NewContext();
             var dienst = new PersonImportService(

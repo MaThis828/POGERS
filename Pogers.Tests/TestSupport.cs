@@ -95,11 +95,11 @@ namespace Pogers.Tests
 
         public static ILogger<T> Logger<T>() => NullLogger<T>.Instance;
 
-        public static string PersonSeite(string? cursor, params string[] personenJson) =>
+        public static string Seite(string? cursor, params string[] dokumenteJson) =>
             $$"""
             {
-              "numFound": {{personenJson.Length}},
-              "documents": [{{string.Join(",", personenJson)}}],
+              "numFound": {{dokumenteJson.Length}},
+              "documents": [{{string.Join(",", dokumenteJson)}}],
               "cursor": {{(cursor is null ? "null" : $"\"{cursor}\"")}}
             }
             """;
@@ -114,6 +114,19 @@ namespace Pogers.Tests
               "titel": {{(titel is null ? "null" : $"\"{titel}\"")}},
               "fraktion": {{(fraktion is null ? "null" : $"[\"{fraktion}\"]")}},
               "wahlperiode": [21]
+            }
+            """;
+
+        public static string Vorgang(int id, string titel, string? vorgangstyp = "Gesetzgebung",
+            string? beratungsstand = "Noch nicht beraten") =>
+            $$"""
+            {
+              "id": "{{id}}",
+              "titel": "{{titel}}",
+              "vorgangstyp": {{(vorgangstyp is null ? "null" : $"\"{vorgangstyp}\"")}},
+              "wahlperiode": 21,
+              "datum": "2026-07-10",
+              "beratungsstand": {{(beratungsstand is null ? "null" : $"\"{beratungsstand}\"")}}
             }
             """;
 

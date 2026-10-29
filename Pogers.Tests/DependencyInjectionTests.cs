@@ -65,6 +65,7 @@ namespace Pogers.Tests
 
             using var bereich = anbieter.CreateScope();
             Assert.NotNull(bereich.ServiceProvider.GetRequiredService<IPersonImportService>());
+            Assert.NotNull(bereich.ServiceProvider.GetRequiredService<IVorgangImportService>());
             Assert.Equal("https://dip.test/api/v1",
                 anbieter.GetRequiredService<IOptions<DipApiOptions>>().Value.BaseUrl);
         }

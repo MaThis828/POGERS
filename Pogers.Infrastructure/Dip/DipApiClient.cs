@@ -20,14 +20,20 @@ namespace Pogers.Infrastructure.Dip
             _optionen = optionen.Value;
         }
 
-        public async IAsyncEnumerable<PersonDto> GetPersonenAsync(
-            int wahlperiode, [EnumeratorCancellation] CancellationToken ct = default)
+        public IAsyncEnumerable<PersonDto> GetPersonenAsync(int wahlperiode, CancellationToken ct = default) =>
+            HoleAlleSeitenAsync<PersonDto>("person", wahlperiode, ct);
+
+        public IAsyncEnumerable<VorgangDto> GetVorgaengeAsync(int wahlperiode, CancellationToken ct = default) =>
+            HoleAlleSeitenAsync<VorgangDto>("vorgang", wahlperiode, ct);
+
+        private async IAsyncEnumerable<T> HoleAlleSeitenAsync<T>(
+            string pfad, int wahlperiode, [EnumeratorCancellation] CancellationToken ct)
         {
             string? cursor = null;
 
             while (true)
             {
-                var url = $"{_optionen.BaseUrl}/person?f.wahlperiode={wahlperiode}" +
+                var url = $"{_optionen.BaseUrl}/{pfad}?f.wahlperiode={wahlperiode}" +
                           (cursor is null ? "" : $"&cursor={Uri.EscapeDataString(cursor)}");
 
                 // Key im Header, damit er nicht in URL-Logs landet
@@ -38,11 +44,11 @@ namespace Pogers.Infrastructure.Dip
                 WirfBeiFehler(antwort);
 
                 var seite = await antwort.Content
-                    .ReadFromJsonAsync<DipPageResponse<PersonDto>>(cancellationToken: ct)
+                    .ReadFromJsonAsync<DipPageResponse<T>>(cancellationToken: ct)
                     ?? throw new DipApiException("Die DIP-API lieferte eine leere Antwort.");
 
-                foreach (var person in seite.Documents)
-                    yield return person;
+                foreach (var eintrag in seite.Documents)
+                    yield return eintrag;
 
                 // Auf der letzten Seite wiederholt die API den Cursor
                 if (seite.Cursor is null || seite.Cursor == cursor || seite.Documents.Count == 0)

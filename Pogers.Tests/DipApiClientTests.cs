@@ -9,8 +9,8 @@ namespace Pogers.Tests
         public async Task Liefert_Personen_ueber_mehrere_Cursor_Seiten()
         {
             var handler = new FakeHttpMessageHandler()
-                .RespondWithJson(TestFactory.PersonSeite("seite2", TestFactory.Person(1, "Lars", "Klingbeil")))
-                .RespondWithJson(TestFactory.PersonSeite("seite2", TestFactory.Person(2, "Olaf", "Scholz")));
+                .RespondWithJson(TestFactory.Seite("seite2", TestFactory.Person(1, "Lars", "Klingbeil")))
+                .RespondWithJson(TestFactory.Seite("seite2", TestFactory.Person(2, "Olaf", "Scholz")));
 
             var personen = await TestFactory.DipClient(handler.CreateClient()).GetPersonenAsync(21).ToListAsync();
 
@@ -22,7 +22,7 @@ namespace Pogers.Tests
         public async Task Endet_bei_Cursor_null()
         {
             var handler = new FakeHttpMessageHandler()
-                .RespondWithJson(TestFactory.PersonSeite(null, TestFactory.Person(1, "Olaf", "Scholz")));
+                .RespondWithJson(TestFactory.Seite(null, TestFactory.Person(1, "Olaf", "Scholz")));
 
             var personen = await TestFactory.DipClient(handler.CreateClient()).GetPersonenAsync(21).ToListAsync();
 
@@ -34,8 +34,8 @@ namespace Pogers.Tests
         public async Task Endet_bei_leerer_Seite()
         {
             var handler = new FakeHttpMessageHandler()
-                .RespondWithJson(TestFactory.PersonSeite("weiter", TestFactory.Person(1, "Olaf", "Scholz")))
-                .RespondWithJson(TestFactory.PersonSeite("nochweiter"));
+                .RespondWithJson(TestFactory.Seite("weiter", TestFactory.Person(1, "Olaf", "Scholz")))
+                .RespondWithJson(TestFactory.Seite("nochweiter"));
 
             var personen = await TestFactory.DipClient(handler.CreateClient()).GetPersonenAsync(21).ToListAsync();
 
@@ -46,7 +46,7 @@ namespace Pogers.Tests
         [Fact]
         public async Task Wahlperiode_steht_in_der_Url_und_der_Key_nur_im_Header()
         {
-            var handler = new FakeHttpMessageHandler().RespondWithJson(TestFactory.PersonSeite(null));
+            var handler = new FakeHttpMessageHandler().RespondWithJson(TestFactory.Seite(null));
 
             await TestFactory.DipClient(handler.CreateClient()).GetPersonenAsync(21).ToListAsync();
 

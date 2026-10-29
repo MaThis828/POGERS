@@ -6,5 +6,7 @@ namespace Pogers.Infrastructure.Dip
     public interface IDipApiClient
     {
         IAsyncEnumerable<PersonDto> GetPersonenAsync(int wahlperiode, CancellationToken ct = default);
+
+        IAsyncEnumerable<VorgangDto> GetVorgaengeAsync(int wahlperiode, CancellationToken ct = default);
     }
 }
