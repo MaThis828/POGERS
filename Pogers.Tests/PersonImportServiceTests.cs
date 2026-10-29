@@ -41,23 +41,49 @@ namespace Pogers.Tests
         [InlineData(null, null)]
         public void Liest_den_akademischen_Titel_vor_dem_Vornamen(string? dipTitel, string? erwartet)
         {
-            var dto = new PersonDto("1", "Ada", "Lovelace", dipTitel, null, null);
+            var dto = new PersonDto("1", "Ada", "Lovelace", dipTitel, null, null, null);
 
             Assert.Equal(erwartet, PersonImportService.LiesAkademischenTitel(dto));
         }
 
         [Fact]
-        public async Task Ueberspringt_Personen_ohne_Fraktion()
+        public async Task Importiert_Personen_ohne_Fraktion_mit_leerer_Mitgliedschaft()
         {
             using var db = new TestDb();
 
-            var bilanz = await ImportiereAsync(db, 21,
-                TestFactory.Person(1, "Olaf", "Scholz", "SPD"),
-                TestFactory.Person(2, "Olaf", "Scholz", fraktion: null));
+            var bilanz = await ImportiereAsync(db, 21, TestFactory.Person(8250, "Cansel", "Kiziltepe", fraktion: null));
 
             Assert.Equal(1, bilanz.Angelegt);
             using var pruef = db.NewContext();
-            Assert.Equal(1, (await pruef.Personen.SingleAsync()).Id);
+            Assert.Null((await pruef.PersonWahlperioden.SingleAsync()).FraktionId);
+        }
+
+        [Fact]
+        public async Task Nimmt_bei_Regierungsmitgliedern_die_Fraktion_aus_der_Rolle_der_Wahlperiode()
+        {
+            using var db = new TestDb();
+
+            await ImportiereAsync(db, 21,
+                TestFactory.Person(8120, "Lars", "Klingbeil", fraktion: null, rolle: ("SPD", new[] { 20, 21 })),
+                TestFactory.Person(8167, "Friedrich", "Merz", fraktion: null, rolle: ("CDU/CSU", new[] { 16, 20 })));
+
+            using var pruef = db.NewContext();
+            var fraktionen = await pruef.PersonWahlperioden.OrderBy(pw => pw.PersonId)
+                .Select(pw => pw.Fraktion == null ? null : pw.Fraktion.Name).ToListAsync();
+            Assert.Equal(new[] { "SPD", null }, fraktionen);
+        }
+
+        [Fact]
+        public async Task Fehlende_Fraktion_ueberschreibt_keine_bekannte()
+        {
+            using var db = new TestDb();
+
+            await ImportiereAsync(db, 21, TestFactory.Person(1, "Ada", "Lovelace", "SPD"));
+            await ImportiereAsync(db, 21, TestFactory.Person(1, "Ada", "Lovelace", fraktion: null));
+
+            using var pruef = db.NewContext();
+            var mitgliedschaft = await pruef.PersonWahlperioden.Include(pw => pw.Fraktion).SingleAsync();
+            Assert.Equal("SPD", mitgliedschaft.Fraktion!.Name);
         }
 
         [Fact]
@@ -111,7 +137,7 @@ namespace Pogers.Tests
             using var pruef = db.NewContext();
             var fraktionen = await pruef.PersonWahlperioden
                 .OrderBy(pw => pw.Wahlperiode)
-                .Select(pw => pw.Fraktion.Name)
+                .Select(pw => pw.Fraktion!.Name)
                 .ToListAsync();
 
             Assert.Equal(new[] { "DIE LINKE.", "BSW" }, fraktionen);
@@ -127,7 +153,7 @@ namespace Pogers.Tests
 
             using var pruef = db.NewContext();
             var mitgliedschaft = await pruef.PersonWahlperioden.Include(pw => pw.Fraktion).SingleAsync();
-            Assert.Equal("fraktionslos", mitgliedschaft.Fraktion.Name);
+            Assert.Equal("fraktionslos", mitgliedschaft.Fraktion!.Name);
         }
 
         private static async Task<ImportBilanz> ImportiereAsync(TestDb db, int wahlperiode, params string[] personenJson)

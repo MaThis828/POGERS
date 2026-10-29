@@ -83,7 +83,7 @@ namespace Pogers.Tests
             using var pruef = db.NewContext();
             var fraktionen = await pruef.PersonWahlperioden
                 .OrderBy(pw => pw.Wahlperiode)
-                .Select(pw => pw.Fraktion.Name)
+                .Select(pw => pw.Fraktion!.Name)
                 .ToListAsync();
 
             Assert.Equal(new[] { "DIE LINKE.", "BSW" }, fraktionen);

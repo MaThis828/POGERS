@@ -8,7 +8,7 @@ using Pogers.Infrastructure.Dip;
 namespace Pogers.Infrastructure.Services
 {
     /// <summary>
-    /// Importiert die Abgeordneten einer Wahlperiode aus der DIP-API
+    /// Importiert die Personen einer Wahlperiode aus der DIP-API
     /// </summary>
     public class PersonImportService : IPersonImportService
     {
@@ -35,13 +35,13 @@ namespace Pogers.Infrastructure.Services
             var angelegt = 0;
             var aktualisiert = 0;
             var uebersprungen = 0;
+            var ohneFraktion = 0;
 
             await foreach (var dto in _client.GetPersonenAsync(wahlperiode, ct))
             {
-                // Ohne Fraktion ist es eine Regierungsrolle (Minister, MdBR), kein Abgeordneter
-                var fraktionsname = dto.Fraktion?.FirstOrDefault();
-                if (string.IsNullOrWhiteSpace(fraktionsname) || !int.TryParse(dto.Id, out var id))
+                if (!int.TryParse(dto.Id, out var id))
                 {
+                    _logger.LogWarning("Person mit unlesbarer Id {Id} uebersprungen.", dto.Id);
                     uebersprungen++;
                     continue;
                 }
@@ -69,15 +69,19 @@ namespace Pogers.Infrastructure.Services
                     person.Wahlperioden.Add(mitgliedschaft);
                 }
 
-                // Navigation statt FraktionId, neue Fraktionen haben noch keine Id
-                mitgliedschaft.Fraktion = HoleOderLegeAn(fraktionsname, fraktionen);
+                // Ohne Angabe bleibt eine bekannte Fraktion stehen, z. B. aus den Abstimmungslisten
+                var fraktionsname = LiesFraktion(dto, wahlperiode);
+                if (fraktionsname is not null)
+                    mitgliedschaft.Fraktion = HoleOderLegeAn(fraktionsname, fraktionen);
+                else
+                    ohneFraktion++;
             }
 
             await _db.SaveChangesAsync(ct);
 
             _logger.LogInformation(
-                "Personenimport Wahlperiode {Wahlperiode}: {Angelegt} angelegt, {Aktualisiert} aktualisiert, {Uebersprungen} uebersprungen.",
-                wahlperiode, angelegt, aktualisiert, uebersprungen);
+                "Personenimport Wahlperiode {Wahlperiode}: {Angelegt} angelegt, {Aktualisiert} aktualisiert, {OhneFraktion} ohne Fraktion, {Uebersprungen} uebersprungen.",
+                wahlperiode, angelegt, aktualisiert, ohneFraktion, uebersprungen);
 
             return new ImportBilanz(angelegt, aktualisiert);
         }
@@ -91,6 +95,19 @@ namespace Pogers.Infrastructure.Services
 
             var titel = dto.Titel![..ende].Trim();
             return titel.Length == 0 ? null : titel;
+        }
+
+        // Bei Regierungsmitgliedern ist "fraktion" leer, die Fraktion steht dann in den Rollen
+        public static string? LiesFraktion(PersonDto dto, int wahlperiode)
+        {
+            var aktuell = dto.Fraktion?.FirstOrDefault(f => !string.IsNullOrWhiteSpace(f));
+            if (aktuell is not null)
+                return aktuell;
+
+            return dto.Rollen?
+                .Where(r => r.Wahlperioden?.Contains(wahlperiode) == true)
+                .Select(r => r.Fraktion)
+                .FirstOrDefault(f => !string.IsNullOrWhiteSpace(f));
         }
 
         private Fraktion HoleOderLegeAn(string name, Dictionary<string, Fraktion> cache)

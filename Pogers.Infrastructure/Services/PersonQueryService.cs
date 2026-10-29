@@ -17,12 +17,13 @@ namespace Pogers.Infrastructure.Services
             int wahlperiode, string? fraktion, CancellationToken ct = default)
         {
             // Ausgangspunkt ist die Mitgliedschaft, dort haengt die Fraktion je Wahlperiode
+            // Nur mit Fraktion: ohne sind es Bundesratsmitglieder oder Regierungsrollen ohne Mandat
             var abfrage = _db.PersonWahlperioden
                 .AsNoTracking()
-                .Where(pw => pw.Wahlperiode == wahlperiode);
+                .Where(pw => pw.Wahlperiode == wahlperiode && pw.Fraktion != null);
 
             if (!string.IsNullOrWhiteSpace(fraktion))
-                abfrage = abfrage.Where(pw => pw.Fraktion.Name == fraktion);
+                abfrage = abfrage.Where(pw => pw.Fraktion!.Name == fraktion);
 
             return await abfrage
                 .OrderBy(pw => pw.Person.Nachname)
@@ -32,7 +33,7 @@ namespace Pogers.Infrastructure.Services
                     pw.Person.Vorname,
                     pw.Person.Nachname,
                     pw.Person.Titel,
-                    pw.Fraktion.Name))
+                    pw.Fraktion!.Name))
                 .ToListAsync(ct);
         }
     }
