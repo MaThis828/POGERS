@@ -1,0 +1,18 @@
+table {
+  border-collapse: collapse;
+  margin-top: 1rem;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 0.35rem 0.75rem;
+  text-align: left;
+}
+
+th {
+  background: #f2f2f2;
+}
+
+.fehler {
+  color: #a00;
+}

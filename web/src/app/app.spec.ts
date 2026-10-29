@@ -1,23 +1,23 @@
 import { TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { App } from './app';
 
 describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App],
+      providers: [provideHttpClient(), provideHttpClientTesting()]
     }).compileComponents();
   });
 
-  it('should create the app', () => {
+  it('zeigt die Personenliste', () => {
     const fixture = TestBed.createComponent(App);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
-  });
+    fixture.detectChanges();
+    TestBed.inject(HttpTestingController).expectOne(r => r.url === '/api/personen').flush([]);
+    fixture.detectChanges();
 
-  it('should render title', async () => {
-    const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, web');
+    const ueberschrift = (fixture.nativeElement as HTMLElement).querySelector('h1')?.textContent;
+    expect(ueberschrift).toContain('Abgeordnete der 21. Wahlperiode');
   });
 });
