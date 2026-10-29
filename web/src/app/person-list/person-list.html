@@ -1,0 +1,46 @@
+<h1>Abgeordnete der {{ wahlperiode }}. Wahlperiode</h1>
+
+@if (laedt()) {
+  <p>Wird geladen…</p>
+}
+
+@if (fehler(); as meldung) {
+  <p class="fehler">{{ meldung }}</p>
+}
+
+@if (!laedt() && !fehler()) {
+  <label>
+    Fraktion:
+    <select [(ngModel)]="gewaehlteFraktion">
+      <option value="">Alle</option>
+      @for (f of fraktionen(); track f) {
+        <option [value]="f">{{ f }}</option>
+      }
+    </select>
+  </label>
+
+  <p>{{ sichtbarePersonen().length }} von {{ personen().length }} Abgeordneten</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Nachname</th>
+        <th>Vorname</th>
+        <th>Titel</th>
+        <th>Fraktion</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (person of sichtbarePersonen(); track person.id) {
+        <tr>
+          <td>{{ person.nachname }}</td>
+          <td>{{ person.vorname }}</td>
+          <td>{{ person.titel }}</td>
+          <td>{{ person.fraktion }}</td>
+        </tr>
+      } @empty {
+        <tr><td colspan="4">Keine Abgeordneten gefunden. Wurde der Import im Worker schon ausgefuehrt?</td></tr>
+      }
+    </tbody>
+  </table>
+}
