@@ -25,6 +25,16 @@ namespace Pogers.Infrastructure
         }
 
         /// <summary>
+        /// Lesende Abfragen fuer die Api
+        /// </summary>
+        public static IServiceCollection AddAbfragen(this IServiceCollection dienste)
+        {
+            dienste.AddScoped<IPersonQueryService, PersonQueryService>();
+
+            return dienste;
+        }
+
+        /// <summary>
         /// Import aus der DIP-API. Braucht nur der Worker, darum prueft nur er den Key.
         /// </summary>
         public static IServiceCollection AddImport(

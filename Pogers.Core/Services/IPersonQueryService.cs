@@ -7,6 +7,6 @@ namespace Pogers.Core.Services
     public interface IPersonQueryService
     {
         Task<IReadOnlyList<PersonListItem>> GetPersonenAsync(
-            string? fraktion, CancellationToken ct = default);
+            int wahlperiode, string? fraktion, CancellationToken ct = default);
     }
 }

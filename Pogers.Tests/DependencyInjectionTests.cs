@@ -49,6 +49,15 @@ namespace Pogers.Tests
         }
 
         [Fact]
+        public void AddAbfragen_registriert_die_Personenabfrage()
+        {
+            using var anbieter = Baue(d => d.AddPersistence(Konfiguration(apiKey: null)).AddAbfragen());
+
+            using var bereich = anbieter.CreateScope();
+            Assert.NotNull(bereich.ServiceProvider.GetRequiredService<IPersonQueryService>());
+        }
+
+        [Fact]
         public void AddImport_registriert_den_Personenimport()
         {
             var konfiguration = Konfiguration();
