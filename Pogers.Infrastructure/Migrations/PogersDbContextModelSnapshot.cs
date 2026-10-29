@@ -105,7 +105,7 @@ namespace Pogers.Infrastructure.Migrations
                     b.Property<int>("Wahlperiode")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("FraktionId")
+                    b.Property<int?>("FraktionId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("PersonId", "Wahlperiode");
@@ -182,8 +182,7 @@ namespace Pogers.Infrastructure.Migrations
                     b.HasOne("Pogers.Core.Entities.Fraktion", "Fraktion")
                         .WithMany("Mitglieder")
                         .HasForeignKey("FraktionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Pogers.Core.Entities.Person", "Person")
                         .WithMany("Wahlperioden")

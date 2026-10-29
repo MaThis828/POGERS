@@ -105,7 +105,7 @@ namespace Pogers.Tests
             """;
 
         public static string Person(int id, string vorname, string nachname,
-            string? fraktion = "SPD", string? titel = null) =>
+            string? fraktion = "SPD", string? titel = null, (string Fraktion, int[] Wahlperioden)? rolle = null) =>
             $$"""
             {
               "id": "{{id}}",
@@ -113,7 +113,9 @@ namespace Pogers.Tests
               "nachname": "{{nachname}}",
               "titel": {{(titel is null ? "null" : $"\"{titel}\"")}},
               "fraktion": {{(fraktion is null ? "null" : $"[\"{fraktion}\"]")}},
-              "wahlperiode": [21]
+              "wahlperiode": [21],
+              "person_roles": {{(rolle is null ? "null" :
+                  $"[{{\"fraktion\": \"{rolle.Value.Fraktion}\", \"wahlperiode_nummer\": [{string.Join(",", rolle.Value.Wahlperioden)}]}}]")}}
             }
             """;
 

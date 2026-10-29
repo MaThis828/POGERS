@@ -14,6 +14,14 @@ namespace Pogers.Tests
         }
 
         [Fact]
+        public async Task Personen_ohne_Fraktion_erscheinen_nicht()
+        {
+            var ergebnis = await AbfrageAsync(21, null);
+
+            Assert.DoesNotContain(ergebnis, p => p.Nachname == "Kiziltepe");
+        }
+
+        [Fact]
         public async Task Ergebnis_ist_nach_Nachname_sortiert()
         {
             var ergebnis = await AbfrageAsync(21, null);
@@ -73,7 +81,8 @@ namespace Pogers.Tests
                     Person(2, "Lars", "Klingbeil", null, Mitglied(21, spd)),
                     Person(3, "Friedrich", "Merz", "Dr.", Mitglied(21, cdu)),
                     Person(4, "Ada", "Lovelace", null, Mitglied(21, new Fraktion { Name = "fraktionslos" })),
-                    Person(5, "Gregor", "Gysi", null, Mitglied(20, new Fraktion { Name = "DIE LINKE." })));
+                    Person(5, "Gregor", "Gysi", null, Mitglied(20, new Fraktion { Name = "DIE LINKE." })),
+                    Person(6, "Cansel", "Kiziltepe", null, Mitglied(21, null)));
 
                 await ctx.SaveChangesAsync();
             }
@@ -85,7 +94,7 @@ namespace Pogers.Tests
         private static Person Person(int id, string vorname, string nachname, string? titel, PersonWahlperiode mitglied) =>
             new() { Id = id, Vorname = vorname, Nachname = nachname, Titel = titel, Wahlperioden = { mitglied } };
 
-        private static PersonWahlperiode Mitglied(int wahlperiode, Fraktion fraktion) =>
+        private static PersonWahlperiode Mitglied(int wahlperiode, Fraktion? fraktion) =>
             new() { Wahlperiode = wahlperiode, Fraktion = fraktion };
     }
 }

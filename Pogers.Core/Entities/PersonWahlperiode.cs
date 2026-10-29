@@ -1,7 +1,7 @@
 ﻿namespace Pogers.Core.Entities
 {
     /// <summary>
-    /// Klasse PersonWahlperiode 
+    /// Klasse PersonWahlperiode
     /// </summary>
     public class PersonWahlperiode
     {
@@ -10,7 +10,8 @@
 
         public int Wahlperiode { get; set; }
 
-        public int FraktionId { get; set; }
-        public Fraktion Fraktion { get; set; } = null!;
+        // Leer, wenn die DIP-API keine Fraktion nennt, z. B. bei Regierungsmitgliedern
+        public int? FraktionId { get; set; }
+        public Fraktion? Fraktion { get; set; }
     }
 }
